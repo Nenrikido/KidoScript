@@ -9,9 +9,10 @@ A smooth and fast writing language based on BrainFuck (but much simpler dw)
 - There's no `null`, `undefined` or `None` equivalents are 0 and "" is weakly equal to 0
 - Here's an Hello World ! : `"Hello World !".`
 - There's no real booleans, results of comparison are 1 if `True` and 0 if `False`
+- All other characters not in the keys below (basically all characters not enclosed in double quotes) won't be used and will be like commentaries
 
-- KidoScript isn't yet supporting Floating Values, Value Structures, Unicode and Object Oriented Programmation but that's to go
-- Virtual Memories can also be a way to go
+- KidoScript isn't yet supporting Floating Values, Value Structures, Unicode and Object Oriented Programmation but that's to go (except for Value Structures 'cause it's already using a big one)
+- Virtual Memories can also be a way to go (and a replacement for advanced Value Structures)
 
 ### Base Keys :
 
@@ -27,17 +28,18 @@ A smooth and fast writing language based on BrainFuck (but much simpler dw)
 - `--` : 				Substraction operator
 - `*` : 				Multiplication operator
 - `/` : 				Dividing operator
-- `#` :				Go to first memory case
-- `%` :				Go to last memory case
+- `%` :					Modulo operator
+- `#` :					Go to first memory case
+- `;` :					Go to last memory case
 
 ### Structures :
 
 - `[ PrintPointerOfStartEnd&Step [ CodeToLoop ]` : 			For loop (End or Start and End or Start and End and Step)
 - `Condition ?[ CodeToLoop ]` : 								While loop
 - `Condition ? CodeToExecutreIfTrue : CodeToExecuteIfFalse` : If Else Elseif structure (else is optionnal)
-- `( PrintFunctionName ( CodeToExecuteAsFunction )` : 		Store a function at memory case (as string starting by `func:`)
-- `{ PointerDeplacement }` :									Move value of memory case at pointer position by PointerDeplacement (accept only loops 																	and pointer deplacement keys)
-- `~{ PointerDeplacement }` :									Copy value of memory case at pointer position by PointerDecplacement (idem)
+- `{ PrintFunctionName { CodeToExecuteAsFunction }` : 		Store a function at memory case (as string starting by `func:`)
+- `( PointerDeplacement )` :									Move value of memory case at pointer position by PointerDeplacement (accept only loops 																	and pointer deplacement keys)
+- `~( PointerDeplacement )` :									Copy value of memory case at pointer position by PointerDecplacement (idem)
 - `$` : 														Return value from function in memory case (need to be launched in another memory case and 																is exactly like `^` if isn't in function)
 - `^` :														Execute code from stored function (or do same as ,)
 - `@` : 														Evaluate code in string in memory case at pointer position like a function
