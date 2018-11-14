@@ -8,6 +8,7 @@ A smooth and fast writing language based on BrainFuck (but much simpler dw)
 - Pointer is by default at first memory case
 - There's no `null`, `undefined` or `None` equivalents are 0 and "" is weakly equal to 0
 - Here's an Hello World ! : `"Hello World !".`
+- There's no real booleans, results of comparison are 1 if `True` and 0 if `False`
 
 - KidoScript isn't yet supporting Floating Values, Value Structures, Unicode and Object Oriented Programmation but that's to go
 - Virtual Memories can also be a way to go
@@ -37,15 +38,15 @@ A smooth and fast writing language based on BrainFuck (but much simpler dw)
 - `( PrintFunctionName ( CodeToExecuteAsFunction )` : 		Store a function at memory case (as string starting by `func:`)
 - `{ PointerDeplacement }` :									Move value of memory case at pointer position by PointerDeplacement (accept only loops 																	and pointer deplacement keys)
 - `~{ PointerDeplacement }` :									Copy value of memory case at pointer position by PointerDecplacement (idem)
-- `$` : 														Return value from function in memory case (need to be launched in another memory case and 																in function)
+- `$` : 														Return value from function in memory case (need to be launched in another memory case and 																is exactly like `^` if isn't in function)
 - `^` :														Execute code from stored function (or do same as ,)
 - `@` : 														Evaluate code in string in memory case at pointer position like a function
 
 ### Weak comparison (comparing with value processing) : 
 
 - `=` : 	Equality comparison
-- `+=` : 	Greater Than or Equal comparison
-- `-=` : 	Lesser Than or Equal comparison
+- `>=` : 	Greater Than or Equal comparison
+- `<=` : 	Lesser Than or Equal comparison
 - `!=` : 	Non equality comparison
 - `!` : 	Non gate
 - `&` : 	And gate
@@ -55,8 +56,8 @@ A smooth and fast writing language based on BrainFuck (but much simpler dw)
 
 - `*=` : 	Sum comparison (comparing global added values)
 - `/=` : 	Equality comparison
-- `+/=` : Greater Than or Equal comparison
-- `-/=` : Lesser Than or Equal comparison
+- `>/=` : Greater Than or Equal comparison
+- `</=` : Lesser Than or Equal comparison
 - `!/=` : Non equality comparison
 - `!/` : 	Non gate
 - `&/` : 	And gate
