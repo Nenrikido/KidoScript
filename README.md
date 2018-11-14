@@ -34,15 +34,15 @@ A smooth and fast writing language based on BrainFuck (but much simpler dw)
 
 ### Structures :
 
-- `[ PrintPointerOfStartEnd&Step [ CodeToLoop ]` : 			For loop (End or Start and End or Start and End and Step)
-- `Condition ?[ CodeToLoop ]` : 								While loop
-- `Condition ? CodeToExecutreIfTrue : CodeToExecuteIfFalse` : If Else Elseif structure (else is optionnal)
-- `{ PrintFunctionName { CodeToExecuteAsFunction }` : 		Store a function at memory case (as string starting by `func:`)
-- `( PointerDeplacement )` :									Move value of memory case at pointer position by PointerDeplacement (accept only loops 																	and pointer deplacement keys)
-- `~( PointerDeplacement )` :									Copy value of memory case at pointer position by PointerDecplacement (idem)
-- `$` : 														Return value from function in memory case (need to be launched in another memory case and 																is exactly like `^` if isn't in function)
-- `^` :														Execute code from stored function (or do same as ,)
-- `@` : 														Evaluate code in string in memory case at pointer position like a function
+- `[ PrintPointerOfStartEnd&Step ]{ CodeToLoop }` : 				For loop (End or Start and End or Start and End and Step)
+- `[ Condition ]?{ CodeToLoop }` : 									While loop
+- `Condition ?{ CodeToExecutreIfTrue : CodeToExecuteIfFalse}` : 	If Else Elseif structure (else is optionnal)
+- `{ PrintArgumentsPositionInMemory { CodeToExecuteAsFunction }` : 	Store a function at memory case (as string starting by `func:`)
+- `( PointerDeplacement )` :										Vector to move value of memory case at pointer position by PointerDeplacement (																			accept only loops and pointer deplacement keys), it can also be used in operations 																		to select another value than the one in the actual memory case. The pointer isn't 																		moving though
+- `~( PointerDeplacement )` :										Copy value of memory case at pointer position by PointerDeplacement (idem)
+- `$` : 															Return value from function in memory case (need to be launched in another memory 																		case and is exactly like `^` if isn't in function)
+- `^` :																Execute code from stored function (or do same as ,)
+- `@` : 															Evaluate code in string in memory case at pointer position like a function
 
 ### Weak comparison (comparing with value processing) : 
 
