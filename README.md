@@ -22,8 +22,8 @@ A smooth and fast writing language based on BrainFuck (but much simpler dw)
 - `<` : 				Move pointer to left
 - `+` : 				Increment memory case at pointer position from 1
 - `-` : 				Decrement memory case at pointer position from 1
-- `\d` : 				(Any decimal) : Change value of memory case at pointer position
-- `"Some String"` : 	Change value of memory case at pointer position by a string (store in the number of bytes in ASCII) (care to reserved word `func:`)
+- `\d` : 				(Any integer decimal) : Change value of memory case at pointer position
+- `"Some String"` : 	Change value of memory case at pointer position by a string (store in the number of bytes in ASCII)
 - `++` : 				Addition operator
 - `--` : 				Substraction operator
 - `*` : 				Multiplication operator
@@ -34,13 +34,18 @@ A smooth and fast writing language based on BrainFuck (but much simpler dw)
 
 ### Structures :
 
-- `[ PrintPointerOfStartEnd&Step ]{ CodeToLoop }` : 				For loop (End or Start and End or Start and End and Step)
-- `[ Condition ]?{ CodeToLoop }` : 									While loop
-- `Condition ?{ CodeToExecutreIfTrue : CodeToExecuteIfFalse}` : 	If Else Elseif structure (else is optionnal)
-- `{ PrintArgumentsPositionInMemory { CodeToExecuteAsFunction }` : 	Store a function at memory case (as string starting by `func:`)
+- `[ PrintPointerOfStartEnd&Step ]{ CodeToLoop }` : 				For loop (End or Start and End or Start and End and Step) (Execute code until the 																		changing value from the for loop has ended what's the for loop has initialized it 																		to do; The memory case at where it has been initializated countains the changing 																		value from the for loop)
+
+- `[ Condition ]?{ CodeToLoop }` : 									While loop (Execute code until the condition in the while loop arguments aren't 																		anymore resolved)
+
+- `Condition ?{ CodeToExecutreIfTrue : CodeToExecuteIfFalse}` : 	If Else Elseif structure (else is optionnal). It uses a weak conditionnal system so 																	`0` and `''` are equivalents to `False` and all the other values are equivalent to 																		`True` 
+
+- `{ PrintArgumentsPositionInMemory { CodeToExecuteAsFunction }` : 	Stores a function at memory case (arguments getting not supported yet because of 																		Virtual Memories not yet implemented)
 - `( PointerDeplacement )` :										Vector to move value of memory case at pointer position by PointerDeplacement (																			accept only loops and pointer deplacement keys), it can also be used in operations 																		to select another value than the one in the actual memory case. The pointer isn't 																		moving though
+
 - `~( PointerDeplacement )` :										Copy value of memory case at pointer position by PointerDeplacement (idem)
 - `$` : 															Return value from function in memory case (need to be launched in another memory 																		case and is exactly like `^` if isn't in function)
+
 - `^` :																Execute code from stored function (or do same as ,)
 - `@` : 															Evaluate code in string in memory case at pointer position like a function
 
@@ -50,17 +55,17 @@ A smooth and fast writing language based on BrainFuck (but much simpler dw)
 - `>=` : 	Greater Than or Equal comparison
 - `<=` : 	Lesser Than or Equal comparison
 - `!=` : 	Non equality comparison
+- `*=` :    Sum comparison (comparing global added values, `"hello"*="leohl"` => 1)
 - `!` : 	Non gate
 - `&` : 	And gate
 - `|` : 	Or gate
 
-### Strong comparison (comparing ascii or global values) :
+### Strong comparison (comparing ascii values and types) :
 
-- `*=` : 	Sum comparison (comparing global added values)
-- `/=` : 	Equality comparison
-- `>/=` : Greater Than or Equal comparison
-- `</=` : Lesser Than or Equal comparison
-- `!/=` : Non equality comparison
-- `!/` : 	Non gate
-- `&/` : 	And gate
-- `|/` : 	Or gate
+- `/=` :   Equality comparison
+- `>/=` :  Greater Than or Equal comparison
+- `</=` :  Lesser Than or Equal comparison
+- `!/=` :  Non equality comparison
+- `!/` :   Non gate
+- `&/` :   And gate
+- `|/` :   Or gate
