@@ -27,13 +27,16 @@ A smooth and fast writing language based on BrainFuck (but much simpler dw)
 - `++` : 				Addition operator
 - `--` : 				Substraction operator
 - `*` : 				Multiplication operator
-- `/` : 				Dividing operator
+- `/` : 				Division operator
+- `**` :                Power operator
+- `//` :                Euclidian division operator
 - `%` :					Modulo operator
 - `#` :					Go to first memory case
 - `;` :					Go to last memory case
 
 ### Structures :
 
+- `( CodeToExecuteWithPriorityHandlingOrComparison )` :    Group of code with operator and comparison priority (`Comparison` (`and` > `or` > `comparison operators`) > `**` > `//` > `%` > `/` > `*` > `-` > `+`)
 - `[ PrintPointerOfStartEnd&Step ]{ CodeToLoop }` : 				For loop (End or Start and End or Start and End and Step) (Execute code until the 																		changing value from the for loop has ended what's the for loop has initialized it 																		to do; The memory case at where it has been initializated countains the changing 																		value from the for loop)
 
 - `[ Condition ]?{ CodeToLoop }` : 									While loop (Execute code until the condition in the while loop arguments aren't 																		anymore resolved)
