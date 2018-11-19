@@ -15,24 +15,24 @@ A smooth and fast writing language based on BrainFuck (but much simpler dw)
 
 ### Base Keys :
 
-- `,` : 				Scan from console to memory case at pointer position
-- `.` : 				Print what's in memory case at pointer position in console
-- `>` : 				Move pointer to right
-- `<` : 				Move pointer to left
-- `+` : 				Increment memory case at pointer position from 1
-- `-` : 				Decrement memory case at pointer position from 1
+- `,` : 				Scans from console to memory case at pointer position
+- `.` : 				Prints what's in memory case at pointer position in console
+- `>` : 				Moves pointer to right
+- `<` : 				Moves pointer to left
+- `++` : 				Increments memory case at pointer position from 1
+- `--` : 				Decrements memory case at pointer position from 1
 - `\d` : 				(Any integer decimal) : Change value of memory case at pointer position
 - `"Some String"` : 	Change value of memory case at pointer position by a string (store in the number of bytes in ASCII)
 
-- `++` : 				Addition operator
-- `--` : 				Substraction operator
+- `+` : 				Addition operator
+- `-` : 				Substraction operator
 - `*` : 				Multiplication operator
 - `/` : 				Division operator
 - `**` :                Power operator
 - `//` :                Euclidian division operator
 - `%` :					Modulo operator
-- `#` :					Go to first memory case
-- `;` :					Go to last memory case
+- `#` :					Goes to first memory case
+- `;` :					Goes to last memory case
 
 ### Structures :
 
@@ -47,27 +47,29 @@ A smooth and fast writing language based on BrainFuck (but much simpler dw)
 
 - `>{ PointerDeplacement }` :										Vector to move value of memory case at pointer position by PointerDeplacement (																			accept only loops and pointer deplacement keys), it can also be used in operations 																		to select another value than the one in the actual memory case. The pointer isn't 																		moving though
 
-- `~{ PointerDeplacement }` :										Copy value of memory case at pointer position by PointerDeplacement (idem)
-- `$` : 															Return value from function in memory case (need to be launched in another memory 																		case and is exactly like `^` if isn't in function)
+- `~{ PointerDeplacement }` :										Copies value of memory case at pointer position by PointerDeplacement (idem)
+- `$` : 															Returns value from function in memory case (need to be launched in another memory 																		case and is exactly like `^` if isn't in function)
 
-- `^` :																Execute code from stored function (or do same as ,)
-- `@` : 															Evaluate code in string in memory case at pointer position like a function
+- `^` :																Executes code from stored function (or do same as ,)
+- `@` : 															Evaluates code in string in memory case at pointer position like a function
 
 ### Weak comparison (comparing with value processing) : 
 
-- `( LeftMember = RightMember )` : 	Equality comparison
+- `( LeftMember == RightMember )` : 	Equality comparison
 - `( LeftMember >= RightMember )` : 	Greater Than or Equal comparison
-- `( LeftMember <= RightMember )` : 	Lesser Than or Equal comparison
+- `( LeftMember <= RightMember )` : 	Lower Than or Equal comparison
 - `( LeftMember != RightMember )` : 	Non equality comparison
-- `( LeftMember *= RightMember )` :    Sum comparison (comparing global added values, `"hello"*="leohl"` => 1)
-
-- `( LeftMember!RightMember )` : 	Non gate
-- `( LeftMember&RightMember )` : 	And gate
-- `( LeftMember|RightMember )` : 	Or gate
+- `( LeftMember *= RightMember )` :    Sum equality comparison (comparing global added values, `"hello"*="leohl"` => 1)
+- `( LeftMember >*= RightMember )` :    Sum greater than or equal comparison (idem as sum equality but with `>=`)
+- `( LeftMember <*= RightMember )` :    Sum lower than or equal comparison (idem as sum equality but with `<=`)
+- `( LeftMember !*= RightMember )` :    Sum non equality comparison (idem as sum equality but with `!=`)
+- `( LeftMember ! RightMember )` : 	Non gate
+- `( LeftMember & RightMember )` : 	And gate
+- `( LeftMember | RightMember )` : 	Or gate
 
 ### Strong comparison (comparing ascii values and types) :
 
-- `( LeftMember /= RightMember )` :   Equality comparison
+- `( LeftMember =/= RightMember )` :   Equality comparison
 - `( LeftMember >/= RightMember )` :  Greater Than or Equal comparison
 - `( LeftMember </= RightMember )` :  Lesser Than or Equal comparison
 - `( LeftMember !/= RightMember )` :  Non equality comparison
