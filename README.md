@@ -12,6 +12,7 @@ A smooth and fast writing language based on BrainFuck (but much simpler dw)
 - All other characters not in the keys below (basically all characters not enclosed in double quotes) won't be used and will be like commentaries
 
 - KidoScript isn't yet supporting Floating Values, Value Structures, Unicode and Object Oriented Programmation but that's to go (except for Value Structures 'cause it's already using a big one)
+- There's actually 45 key patterns and some more to go
 
 ### Base Keys :
 
@@ -36,7 +37,7 @@ A smooth and fast writing language based on BrainFuck (but much simpler dw)
 
 ### Structures :
 
-- `( CodeToExecuteWithPriorityHandlingOrComparison )` :    Group of code with operator and comparison priority (`Comparison` (`and` > `or` > `comparison operators`) > `**` > `//` > `%` > `/` > `*` > `-` > `+`)
+- `( CodeToExecuteWithPriorityHandlingOrComparison )` :    Group of code with operator and comparison priority (`sub groups` > `**`/`//` > `%` > `/`/`*` > `-`/`+` > `Comparison` (`and` > `or` > `comparison operators`))
 - `[ PrintPointerOfStartEnd&Step ]{ CodeToLoop }` : 				For loop (End or Start and End or Start and End and Step) (Execute code until the 																		changing value from the for loop has ended what's the for loop has initialized it 																		to do; The memory case at where it has been initializated countains the changing 																		value from the for loop)
 
 - `[ Condition ]?{ CodeToLoop }` : 									While loop (Execute code until the condition in the while loop arguments aren't 																		anymore resolved)
