@@ -17,12 +17,13 @@
 # -*- coding: utf-8 -*-
 import sys
 import traceback
+import re
 # noinspection PyCompatibility
 from io import StringIO
 import _io
 
 
-# noinspection PyCompatibility
+# noinspection PyCompatibility,PyCallingNonCallable,PyPep8,PyBroadException,PyShadowingNames,PyShadowingNames,PyShadowingNames,PyShadowingNames,PyShadowingNames,PyShadowingNames,PyShadowingNames,PyShadowingNames,PyShadowingNames,PyShadowingNames,PyShadowingNames,PyShadowingNames,PyShadowingNames,PyShadowingNames,PyShadowingNames,PyShadowingNames,PyShadowingNames,PyShadowingNames,PyShadowingNames,PyShadowingNames,PyShadowingNames,PyShadowingNames,PyShadowingNames
 class Interpreter:
     """Python Interpreter for KidoScript, developped by Nenrikido"""
 
@@ -30,10 +31,11 @@ class Interpreter:
     pointer: int
     tempvalue: object
     methods: dict
+    priorities: list
     arguments: list
     i: int
     x: str
-    codestring: str
+    codeString: str
 
     # noinspection PyCompatibility
     class Capturing(list):
@@ -52,7 +54,7 @@ class Interpreter:
             del self._stringIo
             sys.stdout = self._stdout
 
-    # noinspection PyCompatibility
+    # noinspection PyCompatibility,PyShadowingNames,PyShadowingNames
     class Function:
         """Representating a function, arguments will be in first cases of memory"""
 
@@ -61,20 +63,21 @@ class Interpreter:
         tempvalue: object
         pointer: int
         methods: dict
+        priorities: list
         i: int
         x: str
-        codestring: str
+        codeString: str
         returning: bool
 
-        def __init__(self, arguments, codestring, interpreter):
+        def __init__(self, arguments, codeString, interpreter):
             self.arguments = arguments
-            self.codestring = codestring
+            self.codeString = codeString
             self.memory = []
 
             # Simulate inheritance
             self.interpret = interpreter.interpret
             for attribute in dir(interpreter):
-                if attribute not in ['arguments', 'memory', 'codestring']:
+                if attribute not in ['arguments', 'memory', 'codeString']:
                     setattr(self, attribute, getattr(interpreter, attribute))
             for key, method in self.methods.items():
                 setattr(self, method.__name__(), method)
@@ -82,15 +85,17 @@ class Interpreter:
         def execute(self):
             for i, argument in enumerate(self.arguments):
                 self.memory[i] = argument
-            self.interpret(self.codestring)
+            self.interpret(self.codeString)
             if self.returning:
                 self.returning = False
                 return self.memory[self.pointer]
 
     def buildFunction(self, arguments, code):
+        """Builds a function object"""
+
         return self.Function(arguments, code, self)
 
-    # noinspection PyCompatibility
+    # noinspection PyCompatibility,PyShadowingNames
     class Vector:
         """Representating a vector"""
 
@@ -98,17 +103,18 @@ class Interpreter:
         tempvalue: object
         pointer: int
         methods: dict
+        priorities: list
         i: int
         x: str
-        codestring: str
+        codeString: str
 
-        def __init__(self, codestring, interpreter):
-            self.codestring = codestring
+        def __init__(self, codeString, interpreter):
+            self.codeString = codeString
 
             # Simulate inheritance
             self.interpret = interpreter.interpret
             for attribute in dir(interpreter):
-                if attribute not in ['arguments', 'codestring']:
+                if attribute not in ['arguments', 'codeString']:
                     setattr(self, attribute, getattr(interpreter, attribute))
             for key, method in self.methods.items():
                 if key not in [',', '.', '+', '-', '~(', '$']:
@@ -116,10 +122,12 @@ class Interpreter:
 
         def getDeplacement(self):
             beginningPointer = self.pointer
-            self.interpret(self.codestring)
+            self.interpret(self.codeString)
             return self.pointer - beginningPointer
 
     def buildVector(self, code):
+        """Builds a vector object"""
+
         return self.Vector(code, self)
 
     def __init__(self):
@@ -131,16 +139,21 @@ class Interpreter:
                         '2': self.putInt, '3': self.putInt, '4': self.putInt, '5': self.putInt, '6': self.putInt,
                         '7': self.putInt,
                         '8': self.putInt, '9': self.putInt, '"': self.putString, '++': self.add, '--': self.negate,
-                        '*': self.multiplicate, '/': self.divide, '%': self.modulo, '#': self.firstIndex,
-                        ';': self.lastIndex, '[': self.setArguments, ']{': self.startInnerForCode,
+                        '*': self.multiplicate, '/': self.divide, '**': self.power, '//': self.euclidianDivide,
+                        '%': self.modulo, '#': self.firstIndex,
+                        ';': self.lastIndex, '(': self.startGroupCode, '[': self.setArguments,
+                        ']{': self.startInnerForCode,
                         ']?{': self.startInnerWhileCode, '?{': self.startInnerIfCode, '{': self.startFunctionCode,
-                        '(': self.startVectorCode,
-                        '~(': self.startCopyVectorCode, '$': self.returnResult, '^': self.execute, '@': self.evaluate,
-                        '=': self.isWeaklyEq, '>=': self.isWeaklyGe, '<=': self.isWeaklyLe, '!=': self.isWeaklyNe,
-                        '*=': self.isSumEqual, '!': self.weakNon, '&': self.weakAnd, '|': self.weakOr,
+                        '>{': self.startVectorCode,
+                        '~{': self.startCopyVectorCode, '$': self.returnResult, '^': self.execute, '@': self.evaluate,
+                        '==': self.isWeaklyEq, '>=': self.isWeaklyGe, '<=': self.isWeaklyLe, '!=': self.isWeaklyNe,
+                        '*=': self.isSumEq, '>*=': self.isSumGe, '<*=': self.isSumLe, '!*=': self.isSumNe,
+                        '!': self.weakNon, '&': self.weakAnd, '|': self.weakOr,
                         '/=': self.isStronglyEq, '>/=': self.isStronglyGe, '</=': self.isStronglyLe,
                         '!/=': self.isStronglyNe,
                         '!/': self.strongNon, '&/': self.strongAnd, '|/': self.strongOr}
+        self.priorities = ['.\*\*|\/\/', '..%', '..\*|..\/', '..-|..+', '.&\/|..&', '..\|\/|.\|',
+                           '.==|.!=|.>=|.<=|.\*=|>\*=|<\*=|!\*=|=\/=|!\/=|>\/=|<\/=']
         self.arguments = []
         self.i = 0
         self.x = ''
@@ -148,46 +161,46 @@ class Interpreter:
         self.returning = False
 
     def scan(self):
-        """`,` : Scan from console to memory case at pointer position"""
+        """`,` : Scans from console to memory case at pointer position"""
         self.memory[self.pointer] = input()
 
     def print(self):
-        """`.` : Print what's in memory case at pointer position in console"""
+        """`.` : Prints what's in memory case at pointer position in console"""
         print(self.memory[self.pointer])
 
     def moveRight(self):
-        """`>` : Move pointer to right"""
+        """`>` : Moves pointer to right"""
         self.pointer = self.pointer + 1 if self.pointer < len(self.memory) - 1 else 0
 
     def moveLeft(self):
-        """`<` : Move pointer to left"""
+        """`<` : Moves pointer to left"""
         self.pointer = self.pointer - 1 if self.pointer > 0 else len(self.memory) - 1
 
     def incrementPointer(self):
-        """`+` : Increment memory case at pointer position from 1"""
+        """`+` : Increments memory case at pointer position from 1"""
         n = self.memory[self.pointer]
         self.memory[self.pointer] = n - 1 if type(n) == int else chr(ord(n[-1]) + 1)
 
     def decrementPointer(self):
-        """`-` : Decrement memory case at pointer position from 1"""
+        """`-` : Decrements memory case at pointer position from 1"""
         n = self.memory[self.pointer]
         self.memory[self.pointer] = n - 1 if type(n) == int else chr(ord(n[-1]) - 1)
 
     def putInt(self):
-        """`\d` : (Any integer decimal) : Change value of memory case at pointer position"""
+        """`\d` : (Any integer decimal) : Changes value of memory case at pointer position"""
         intString = ''
-        while self.codestring[self.i].isnumeric():
-            intString += self.codestring[self.i]
+        while self.codeString[self.i].isnumeric():
+            intString += self.codeString[self.i]
             self.i += 1
         self.i -= 1
         self.memory[self.pointer] = int(intString)
 
     def putString(self):
-        """`"Some String"` : Change value of memory case at pointer position by a string (store in the number of bytes in ASCII) (care to reserved word `func:`)"""
+        """`"Some String"` : Changes value of memory case at pointer position by a string (store in the number of bytes in ASCII) (care to reserved word `func:`)"""
         self.i += 1
         string = ''
-        while self.codestring[self.i] != '"':
-            string += self.codestring[self.i]
+        while self.codeString[self.i] != '"':
+            string += self.codeString[self.i]
             self.i += 1
         self.memory[self.pointer] = string
 
@@ -195,9 +208,9 @@ class Interpreter:
         """`++` : Addition operator"""
         intString = ''
         self.i += 1
-        if self.codestring[self.i] != '(':
-            while self.codestring[self.i].isnumeric():
-                intString += self.codestring[self.i]
+        if self.codeString[self.i] != '(':
+            while self.codeString[self.i].isnumeric():
+                intString += self.codeString[self.i]
                 self.i += 1
         else:
             intString = self.startVectorCode(True)
@@ -208,9 +221,9 @@ class Interpreter:
         """`--` : Substraction operator"""
         intString = ''
         self.i += 1
-        if self.codestring[self.i] != '(':
-            while self.codestring[self.i].isnumeric():
-                intString += self.codestring[self.i]
+        if self.codeString[self.i] != '(':
+            while self.codeString[self.i].isnumeric():
+                intString += self.codeString[self.i]
                 self.i += 1
         else:
             intString = self.startVectorCode(True)
@@ -221,9 +234,9 @@ class Interpreter:
         """`*` : Multiplication operator"""
         intString = ''
         self.i += 1
-        if self.codestring[self.i] != '(':
-            while self.codestring[self.i].isnumeric():
-                intString += self.codestring[self.i]
+        if self.codeString[self.i] != '(':
+            while self.codeString[self.i].isnumeric():
+                intString += self.codeString[self.i]
                 self.i += 1
         else:
             intString = self.startVectorCode(True)
@@ -231,25 +244,51 @@ class Interpreter:
         self.memory[self.pointer] *= int(intString)
 
     def divide(self):
-        """`/` : Dividing operator"""
+        """`/` : Division operator"""
         intString = ''
         self.i += 1
-        if self.codestring[self.i] != '(':
-            while self.codestring[self.i].isnumeric():
-                intString += self.codestring[self.i]
+        if self.codeString[self.i] != '(':
+            while self.codeString[self.i].isnumeric():
+                intString += self.codeString[self.i]
                 self.i += 1
         else:
             intString = self.startVectorCode(True)
         self.i -= 1
         self.memory[self.pointer] /= int(intString)
 
+    def power(self):
+        """`**` : Power operator"""
+        intString = ''
+        self.i += 1
+        if self.codeString[self.i] != '(':
+            while self.codeString[self.i].isnumeric():
+                intString += self.codeString[self.i]
+                self.i += 1
+        else:
+            intString = self.startVectorCode(True)
+        self.i -= 1
+        self.memory[self.pointer] **= int(intString)
+
+    def euclidianDivide(self):
+        """`//` : Euclidian divisio operator"""
+        intString = ''
+        self.i += 1
+        if self.codeString[self.i] != '(':
+            while self.codeString[self.i].isnumeric():
+                intString += self.codeString[self.i]
+                self.i += 1
+        else:
+            intString = self.startVectorCode(True)
+        self.i -= 1
+        self.memory[self.pointer] //= int(intString)
+
     def modulo(self):
         """`%` : Modulo operator"""
         intString = ''
         self.i += 1
-        if self.codestring[self.i] != '(':
-            while self.codestring[self.i].isnumeric():
-                intString += self.codestring[self.i]
+        if self.codeString[self.i] != '(':
+            while self.codeString[self.i].isnumeric():
+                intString += self.codeString[self.i]
                 self.i += 1
         else:
             intString = self.startVectorCode(True)
@@ -257,12 +296,84 @@ class Interpreter:
         self.memory[self.pointer] %= int(intString)
 
     def firstIndex(self):
-        """`#` : Go to first memory case"""
+        """`#` : Goes to first memory case"""
         self.pointer = 0
 
     def lastIndex(self):
-        """`;` : Go to last memory case"""
+        """`;` : Goes to last memory case"""
         self.pointer = len(self.memory) - 1
+
+    class LiteralToken:
+        def __init__(self, value):
+            self.value = int(value)
+
+        def nud(self):
+            return self.value
+
+    @staticmethod
+    def expression(rbp=0):
+        """Builds the expression with priority"""
+        # noinspection PyGlobalUndefined
+        global token, nextToken
+        t = token
+        token = nextToken()
+        left = t.nud()
+        while rbp < token.lbp:
+            t = token
+            token = nextToken()
+            left = t.led(left)
+        return left
+
+    def createToken(self, operator):
+        """Creates a token"""
+
+        # noinspection PyMethodParameters,PyShadowingNames
+        class Operator:
+            def __init__(this):
+                for i, x in enumerate(self.priorities):
+                    if re.match(x, operator):
+                        this.lbp = i * 10
+                        break
+
+            @staticmethod
+            def nud():
+                if operator == '+':
+                    return self.expression(100)
+                elif operator == '-':
+                    return -self.expression(100)
+
+            @staticmethod
+            def led(left):
+                if operator in '+-//**%':
+                    eval('return ' + left + operator + self.expression(10))
+                else:
+                    return self.methods[operator]
+
+        return Operator()
+
+    def tokenize(self, code):
+        """Recursively checks for priority"""
+        for number, operator in re.findall("\s*(?:(\d+)|(\*\*|.))", code):
+            if number:
+                yield self.LiteralToken(number)
+            elif any(re.match(i, operator) for i in self.priorities):
+                yield self.createToken(operator)
+            else:
+                raise SyntaxError("unknown operator: %r" % operator)
+
+    def startGroupCode(self):
+        """`( CodeToExecuteWithPriorityHandlingOrComparison )` : Group of code with operator and comparison priority (`Comparison` (`and` > `or` > `comparison operators`) > `**` > `//` > `%` > `/` > `*` > `-` > `+`)"""
+        global token, nextToken
+
+        # Get code to execute in group
+        self.i += 1
+        codeString = ''
+        while self.codeString[self.i] != ')':
+            codeString += self.codeString[self.i]
+            self.i += 1
+        nextToken = next(self.tokenize(codeString))
+        token = nextToken()
+        self.memory[self.pointer] = self.expression()
 
     def setArguments(self, endEnclosing=']'):
         """Method setting arguments for for and while loops and functions"""
@@ -270,8 +381,8 @@ class Interpreter:
         # Get code to execute to get arguments
         self.i += 1
         codeToExecute = ''
-        while self.codestring[self.i] != endEnclosing:
-            codeToExecute += self.codestring[self.i]
+        while self.codeString[self.i] != endEnclosing:
+            codeToExecute += self.codeString[self.i]
             self.i += 1
 
         # Execute code in capturing context to get printed values as arguments
@@ -289,10 +400,10 @@ class Interpreter:
             except TypeError:
                 etype, value, tb = sys.exc_info()
                 message = ''.join(traceback.format_exception(etype, value, tb))
-                print(message.split('\n')[0] + '\n  ' + '...' + codestring[
+                print(message.split('\n')[0] + '\n  ' + '...' + codeString[
                                                                 self.i - 3 if self.i - 3 > 0 else 0:self.i + 3] + '...' + '\n' + ' ' * (
-                              self.i + (len(codestring) if len(
-                          codestring) < 6 else 6)) + '^' + '\nTypeError: loop expected at most 3 arguments, got ' + str(
+                              self.i + (len(codeString) if len(
+                          codeString) < 6 else 6)) + '^' + '\nTypeError: loop expected at most 3 arguments, got ' + str(
                     len(
                         self.arguments)),
                       file=sys.stderr)
@@ -301,8 +412,8 @@ class Interpreter:
         # Get code to loop
         self.i += 1
         codeToExecute = ''
-        while self.codestring[self.i] != ']':
-            codeToExecute += self.codestring[self.i]
+        while self.codeString[self.i] != ']':
+            codeToExecute += self.codeString[self.i]
             self.i += 1
 
         # Loop code execution
@@ -323,10 +434,10 @@ class Interpreter:
             except TypeError:
                 etype, value, tb = sys.exc_info()
                 message = ''.join(traceback.format_exception(etype, value, tb))
-                print(message.split('\n')[0] + '\n  ' + '...' + codestring[
+                print(message.split('\n')[0] + '\n  ' + '...' + codeString[
                                                                 self.i - 3 if self.i - 3 > 0 else 0:self.i + 3] + '...' + '\n' + ' ' * (
-                              self.i + (len(codestring) if len(
-                          codestring) < 6 else 6)) + '^' + '\nTypeError: loop expected at most 3 arguments, got ' + str(
+                              self.i + (len(codeString) if len(
+                          codeString) < 6 else 6)) + '^' + '\nTypeError: loop expected at most 3 arguments, got ' + str(
                     len(
                         self.arguments)),
                       file=sys.stderr)
@@ -335,8 +446,8 @@ class Interpreter:
         # Get code to loop
         self.i += 1
         codeToExecute = ''
-        while self.codestring[self.i] != ']':
-            codeToExecute += self.codestring[self.i]
+        while self.codeString[self.i] != ']':
+            codeToExecute += self.codeString[self.i]
             self.i += 1
 
         # Loop code execution
@@ -353,14 +464,14 @@ class Interpreter:
         colonPassed = False
         codeToExecuteIfTrue = ''
         codeToExecuteIfFalse = ''
-        while self.codestring[self.i] != '}':
-            if self.codestring[self.i] == ':':
+        while self.codeString[self.i] != '}':
+            if self.codeString[self.i] == ':':
                 self.i += 1
                 colonPassed = True
             if colonPassed:
-                codeToExecuteIfFalse += self.codestring[self.i]
+                codeToExecuteIfFalse += self.codeString[self.i]
             else:
-                codeToExecuteIfTrue += self.codestring[self.i]
+                codeToExecuteIfTrue += self.codeString[self.i]
             self.i += 1
 
         # Conditionnal code execution
@@ -382,8 +493,8 @@ class Interpreter:
         # Get code to loop
         self.i += 1
         codeToExecute = ''
-        while self.codestring[self.i] != '}':
-            codeToExecute += self.codestring[self.i]
+        while self.codeString[self.i] != '}':
+            codeToExecute += self.codeString[self.i]
             self.i += 1
 
         # Store function
@@ -396,10 +507,10 @@ class Interpreter:
         # Get Vector Deplacement (and errors with it)
         self.i += 1
         codeToExecute = 0
-        while self.codestring[self.i] != ')':
-            codeToExecute += self.codestring[self.i]
+        while self.codeString[self.i] != '}':
+            codeToExecute += self.codeString[self.i]
             self.i += 1
-        vector = self.buildVector(codestring)
+        vector = self.buildVector(codeString)
         deplacement = vector.getDeplacement()
 
         # Move or return deplacement if selectionning
@@ -410,90 +521,165 @@ class Interpreter:
             self.memory[self.pointer] = 0
 
     def startCopyVectorCode(self):
+        """`~{ PointerDeplacement }` :	Copies value of memory case at pointer position by PointerDeplacement (idem)"""
 
         # Get Vector Deplacement (and errors with it)
         self.i += 1
         codeToExecute = 0
-        while self.codestring[self.i] != ')':
-            codeToExecute += self.codestring[self.i]
+        while self.codeString[self.i] != '}':
+            codeToExecute += self.codeString[self.i]
             self.i += 1
-        vector = self.buildVector(self.codestring)
+        vector = self.buildVector(self.codeString)
         deplacement = vector.getDeplacement()
 
         # Copy value
         self.memory[self.pointer + deplacement] = self.memory[self.pointer]
 
     def returnResult(self):
+        """`$` : Return value from function in memory case (need to be launched in another memory case and is exactly like `^` if isn't in function)"""
+
         self.returning = True
 
     def execute(self):
+        """`^` : Execute code from stored function (or do same as ,)"""
+
         try:
             self.memory[self.pointer].execute()
         except AttributeError:
             etype, value, tb = sys.exc_info()
             message = ''.join(traceback.format_exception(etype, value, tb))
-            print(message.split('\n')[0] + '\n  ' + '...' + self.codestring[
+            print(message.split('\n')[0] + '\n  ' + '...' + self.codeString[
                                                             self.i - 3 if self.i - 3 > 0 else 0:self.i + 3] + '...' + '\n' + ' ' * (
-                          self.i + (len(self.codestring) if len(
-                      self.codestring) < 6 else 6)) + '^' + '\nTypeError: \'' + type(
+                          self.i + (len(self.codeString) if len(
+                      self.codeString) < 6 else 6)) + '^' + '\nTypeError: \'' + type(
                 self.memory[self.pointer]) + '\' object is not callable',
                   file=sys.stderr)
 
     def evaluate(self):
+        """`@` : Evaluate code in string in memory case at pointer position like a function"""
+
         try:
             eval(self.memory[self.pointer])
         except:
             print("Traceback (most recent call last):", file=sys.stderr)
             traceback.print_tb(sys.exc_info()[2])
-            print(str(sys.exc_info()[0]).split("<class '")[1].split("'>")[0] + ' : ' + str(sys.exc_info()[1]), file=sys.stderr)
-
-    def isWeaklyEq(self):
-        pass
-
-    def isWeaklyGe(self):
-        pass
-
-    def isWeaklyLe(self):
-        pass
-
-    def isWeaklyNe(self):
-        pass
-
-    def isSumEqual(self):
-        pass
-
-    def weakNon(self):
-        pass
-
-    def weakAnd(self):
-        pass
-
-    def weakOr(self):
-        pass
-
-    def isStronglyEq(self):
-        pass
-
-    def isStronglyGe(self):
-        pass
-
-    def isStronglyLe(self):
-        pass
-
-    def isStronglyNe(self):
-        pass
-
-    def strongNon(self):
-        pass
-
-    def strongAnd(self):
-        pass
-
-    def strongOr(self):
-        pass
+            print(str(sys.exc_info()[0]).split("<class '")[1].split("'>")[0] + ' : ' + str(sys.exc_info()[1]),
+                  file=sys.stderr)
 
     @staticmethod
-    def verify(codestring):
+    def isWeaklyEq(leftMember, rightMember):
+        return leftMember == rightMember if type(leftMember) == type(rightMember) \
+            else ord(leftMember) == rightMember if type(leftMember) == str and len(leftMember) == 1 and type(
+            rightMember) == int \
+            else leftMember == ord(rightMember) if type(rightMember) == int and type(rightMember) == int and len(
+            rightMember) == 1 \
+            else len(leftMember) == rightMember if type(leftMember) == str and type(rightMember) == int \
+            else leftMember == len(rightMember)
+
+    @staticmethod
+    def isWeaklyGe(leftMember, rightMember):
+        return leftMember >= rightMember if type(leftMember) == type(rightMember) \
+            else ord(leftMember) >= rightMember if type(leftMember) == str and len(leftMember) == 1 and type(
+            rightMember) == int \
+            else leftMember >= ord(rightMember) if type(rightMember) == int and type(rightMember) == int and len(
+            rightMember) == 1 \
+            else len(leftMember) >= rightMember if type(leftMember) == str and type(rightMember) == int \
+            else leftMember >= len(rightMember)
+
+    @staticmethod
+    def isWeaklyLe(leftMember, rightMember):
+        return leftMember <= rightMember if type(leftMember) == type(rightMember) \
+            else ord(leftMember) <= rightMember if type(leftMember) == str and len(leftMember) == 1 and type(
+            rightMember) == int \
+            else leftMember <= ord(rightMember) if type(rightMember) == int and type(rightMember) == int and len(
+            rightMember) == 1 \
+            else len(leftMember) <= rightMember if type(leftMember) == str and type(rightMember) == int \
+            else leftMember <= len(rightMember)
+
+    @staticmethod
+    def isWeaklyNe(leftMember, rightMember):
+        return leftMember != rightMember if type(leftMember) == type(rightMember) \
+            else ord(leftMember) != rightMember if type(leftMember) == str and len(leftMember) == 1 and type(
+            rightMember) == int \
+            else leftMember != ord(rightMember) if type(rightMember) == int and type(rightMember) == int and len(
+            rightMember) == 1 \
+            else len(leftMember) != rightMember if type(leftMember) == str and type(rightMember) == int \
+            else leftMember != len(rightMember)
+
+    def isSumEq(self, leftMember, rightMember):
+        return sum([ord(i) for i in leftMember]) == rightMember if type(leftMember) == str and type(rightMember) == int \
+            else leftMember == sum([ord(i) for i in rightMember]) if type(rightMember) == str and type(
+            leftMember) == int \
+            else sum([ord(i) for i in leftMember]) == sum([ord(i) for i in rightMember]) if type(leftMember) == type(
+            rightMember) == str \
+            else self.isWeaklyEq(leftMember, rightMember)
+
+    def isSumGe(self, leftMember, rightMember):
+        return sum([ord(i) for i in leftMember]) >= rightMember if type(leftMember) == str and type(rightMember) == int \
+            else leftMember >= sum([ord(i) for i in rightMember]) if type(rightMember) == str and type(
+            leftMember) == int \
+            else sum([ord(i) for i in leftMember]) >= sum([ord(i) for i in rightMember]) if type(leftMember) == type(
+            rightMember) == str \
+            else self.isWeaklyEq(leftMember, rightMember)
+
+    def isSumLe(self, leftMember, rightMember):
+        return sum([ord(i) for i in leftMember]) <= rightMember if type(leftMember) == str and type(rightMember) == int \
+            else leftMember <= sum([ord(i) for i in rightMember]) if type(rightMember) == str and type(
+            leftMember) == int \
+            else sum([ord(i) for i in leftMember]) <= sum([ord(i) for i in rightMember]) if type(leftMember) == type(
+            rightMember) == str \
+            else self.isWeaklyEq(leftMember, rightMember)
+
+    def isSumNe(self, leftMember, rightMember):
+        return sum([ord(i) for i in leftMember]) != rightMember if type(leftMember) == str and type(rightMember) == int \
+            else leftMember != sum([ord(i) for i in rightMember]) if type(rightMember) == str and type(
+            leftMember) == int \
+            else sum([ord(i) for i in leftMember]) != sum([ord(i) for i in rightMember]) if type(leftMember) == type(
+            rightMember) == str \
+            else self.isWeaklyEq(leftMember, rightMember)
+
+    @staticmethod
+    def weakNon(thing):
+        return not bool(thing)
+
+    @staticmethod
+    def weakAnd(leftMember, rightMember):
+        return bool(leftMember) and bool(rightMember)
+
+    @staticmethod
+    def weakOr(leftMember, rightMember):
+        return bool(leftMember) or bool(rightMember)
+
+    @staticmethod
+    def isStronglyEq(leftMember, rightMember):
+        return leftMember == rightMember and type(leftMember) == type(rightMember)
+
+    @staticmethod
+    def isStronglyGe(leftMember, rightMember):
+        return leftMember >= rightMember and type(leftMember) == type(rightMember)
+
+    @staticmethod
+    def isStronglyLe(leftMember, rightMember):
+        return leftMember <= rightMember and type(leftMember) == type(rightMember)
+
+    @staticmethod
+    def isStronglyNe(leftMember, rightMember):
+        return leftMember != rightMember and type(leftMember) == type(rightMember)
+
+    @staticmethod
+    def strongNon(thing):
+        return not thing
+
+    @staticmethod
+    def strongAnd(leftMember, rightMember):
+        return leftMember and rightMember and type(leftMember) == type(rightMember)
+
+    @staticmethod
+    def strongOr(leftMember, rightMember):
+        return leftMember or rightMember and type(leftMember) == type(rightMember)
+
+    @staticmethod
+    def verify(codeString):
         quotesCheck = -1
         closablesKeys = {'[': 0, '(': 0, '{': 0, '"': 0}
         closingKeys = {']': '[', ')': '(', '}': '{', '"': '"'}
@@ -502,7 +688,7 @@ class Interpreter:
                             '</=',
                             '!', '&']
         temp = ''
-        for i, x in enumerate(list(codestring)):
+        for i, x in enumerate(list(codeString)):
             testNeedingValueKeys = [(temp + x).endswith(n) for n in needingValueKeys]
             if x in closablesKeys.keys() and x != '"':
                 closablesState.append((i, x))
@@ -515,25 +701,22 @@ class Interpreter:
                     except SyntaxError:
                         etype, value, tb = sys.exc_info()
                         message = ''.join(traceback.format_exception(etype, value, tb))
-                        print(message.split('\n')[0] + '\n  ' + '...' + codestring[
+                        print(message.split('\n')[0] + '\n  ' + '...' + codeString[
                                                                         i - 3 if i - 3 > 0 else 0:i + 3] + '...' + '\n' + ' ' * (
-                                      i + (len(codestring) if len(
-                                  codestring) < 6 else 6)) + '^' + '\nSyntaxError: unexpected "' + x + '" at pos ' + str(
+                                      i + (len(codeString) if len(
+                                  codeString) < 6 else 6)) + '^' + '\nSyntaxError: unexpected "' + x + '" at pos ' + str(
                             i),
                               file=sys.stderr)
                         sys.exit(1)
             if any(testNeedingValueKeys):
                 # TODO : care to operators (operator on pointer position)
-                key = ''.join(
-                    needingValueKeys[n] if testNeedingValueKeys[n] else '' for n in range(len(needingValueKeys)))
-                if not (codestring[i + 1] in '"0123456789' and codestring[
-                    i - len(key)] in '"0123456789') and quotesCheck == -1:
+                if not codeString[i + 1] in '"0123456789' and quotesCheck == -1:
                     try:
                         raise SyntaxError
                     except SyntaxError:
                         etype, value, tb = sys.exc_info()
                         message = ''.join(traceback.format_exception(etype, value, tb))
-                        print(message.split('\n')[0] + '\n  ' + '...' + codestring[
+                        print(message.split('\n')[0] + '\n  ' + '...' + codeString[
                                                                         i - 3:i + 3] + '...' + '\n' + ' ' * 8 + '^' + '\nSyntaxError: invalid syntax (pos ' + str(
                             i) + ')', file=sys.stderr)
                         sys.exit(1)
@@ -555,46 +738,47 @@ class Interpreter:
                 except SyntaxError:
                     etype, value, tb = sys.exc_info()
                     message = ''.join(traceback.format_exception(etype, value, tb))
-                    print(message.split('\n')[0] + '\n  ' + codestring + '\nSyntaxError: inconsistent use of "' + str(
+                    print(message.split('\n')[0] + '\n  ' + codeString + '\nSyntaxError: inconsistent use of "' + str(
                         i) + '" (' + str(abs(int(x / 2) if (x > 0 or i in '("{[') else x)) + (
                               ' too much' if x > 0 else ' missing') + ')',
                           file=sys.stderr)
                     sys.exit(1)
 
-    def interpret(self, codestring):
+    def interpret(self, codeString):
 
         # Verifies if good syntax
-        self.codestring = codestring + ' '
-        self.verify(self.codestring)
+        self.codeString = codeString + ' '
+        self.verify(self.codeString)
 
         # Interprets
-        while self.i < len(self.codestring):
-            self.x = self.codestring[self.i]
+        while self.i < len(self.codeString):
+            self.x = self.codeString[self.i]
             try:
-                if self.codestring[self.i + 1] in '+-{(=/':
+                if self.codeString[self.i + 1] in '+-{(=/':
                     self.i += 1
-                    self.x = self.codestring[self.i - 1:self.i + 1]
+                    self.x = self.codeString[self.i - 1:self.i + 1]
                     if self.x in ['/=', '?{']:
                         self.i += 1
-                        self.x = self.codestring[self.i - 2:self.i + 1]
+                        self.x = self.codeString[self.i - 2:self.i + 1]
                         if self.x not in ['>/=', '</=', '!/=', ']?{']:
                             self.i -= 1
-                            self.x = self.codestring[self.i - 1:self.i + 1]
-                    elif self.x not in ['++', '--', '?{', '~(', '>=', '<=', '!=', '*=',
+                            self.x = self.codeString[self.i - 1:self.i + 1]
+                    elif self.x not in ['++', '--', '?{', '~{', '>{', '>=', '<=', '!=', '*=',
                                         '/=', '!/', '&/', '|/']:
                         self.i -= 1
-                        self.x = self.codestring[self.i]
+                        self.x = self.codeString[self.i]
             except IndexError:
                 pass
             if self.x in self.methods.keys():
                 self.tempvalue = self.memory[self.pointer]
                 self.methods[self.x]()
+                # noinspection PyPep8,PyBroadException
                 try:
                     pass  # ^ have to go here
                 except:
                     etype, value, tb = sys.exc_info()
                     message = ''.join(traceback.format_exception(etype, value, tb))
-                    print(message.split('\n')[0] + '\n  ' + '...' + codestring[
+                    print(message.split('\n')[0] + '\n  ' + '...' + codeString[
                                                                     self.i - 3:self.i + 3] + '...' + '\n' + ' ' * 8 + '^\n' +
                           message.split('\n')[-2] + ' (pos ' +
                           str(self.i) + ')', file=sys.stderr)
@@ -602,7 +786,13 @@ class Interpreter:
             self.i += 1
 
 
-codestring = ',>,.<.'
+if __name__ == '__main__':
+    # todo : GUI (or maybe IDE)
+    # todo : Multiprocessing
+    # todo : OOP
+    # todo : Import
+    # todo : read/write in file
+    codeString = ',>,.<.'
 
-i = Interpreter()
-i.interpret(codestring)
+    i = Interpreter()
+    i.interpret(codeString)
