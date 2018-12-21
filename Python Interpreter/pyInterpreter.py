@@ -135,10 +135,10 @@ class Interpreter:
         self.pointer = 0
         self.tempvalue = self.memory[self.pointer]
         self.methods = {',': self.scan, '.': self.print, '>': self.moveRight, '<': self.moveLeft,
-                        '+': self.incrementPointer, '-': self.decrementPointer, '0': self.putInt, '1': self.putInt,
+                        '++': self.incrementPointer, '--': self.decrementPointer, '0': self.putInt, '1': self.putInt,
                         '2': self.putInt, '3': self.putInt, '4': self.putInt, '5': self.putInt, '6': self.putInt,
                         '7': self.putInt,
-                        '8': self.putInt, '9': self.putInt, '"': self.putString, '++': self.add, '--': self.negate,
+                        '8': self.putInt, '9': self.putInt, '"': self.putString, '+': self.add, '-': self.negate,
                         '*': self.multiplicate, '/': self.divide, '**': self.power, '//': self.euclidianDivide,
                         '%': self.modulo, '#': self.firstIndex,
                         ';': self.lastIndex, '(': self.startGroupCode, '[': self.setArguments,
@@ -179,7 +179,7 @@ class Interpreter:
     def incrementPointer(self):
         """`+` : Increments memory case at pointer position from 1"""
         n = self.memory[self.pointer]
-        self.memory[self.pointer] = n - 1 if type(n) == int else chr(ord(n[-1]) + 1)
+        self.memory[self.pointer] = n + 1 if type(n) == int else chr(ord(n[-1]) + 1)
 
     def decrementPointer(self):
         """`-` : Decrements memory case at pointer position from 1"""
@@ -684,7 +684,7 @@ class Interpreter:
         closablesKeys = {'[': 0, '(': 0, '{': 0, '"': 0}
         closingKeys = {']': '[', ')': '(', '}': '{', '"': '"'}
         closablesState = []
-        needingValueKeys = ['++', '--', '*', '/', '%', '?', ':', '=', '>=', '<=', '!=', '!', '&', '|', '/=', '>/=',
+        needingValueKeys = ['*', '/', '+', '-', '**', '//', '%', '?', ':', '=', '>=', '<=', '!=', '!', '&', '|', '/=', '>/=',
                             '</=',
                             '!', '&']
         temp = ''
@@ -697,6 +697,7 @@ class Interpreter:
                     closablesState = closablesState[:-1]
                 else:
                     try:
+                        print('Closable : ' + x)
                         raise SyntaxError
                     except SyntaxError:
                         etype, value, tb = sys.exc_info()
@@ -709,9 +710,14 @@ class Interpreter:
                               file=sys.stderr)
                         sys.exit(1)
             if any(testNeedingValueKeys):
-                # TODO : care to operators (operator on pointer position)
-                if not codeString[i + 1] in '"0123456789' and quotesCheck == -1:
+                j = 0
+                while j < 3:
+                    if codeString[i + 1:i + j] in '"0123456789' and quotesCheck == -1:
+                        break
+                    j += 1
+                if j == 2:
                     try:
+                        print('Needingvalue : ' + codeString[i + 1:i + 1 + len(needingValueKeys[testNeedingValueKeys.index(True)])])
                         raise SyntaxError
                     except SyntaxError:
                         etype, value, tb = sys.exc_info()
@@ -720,11 +726,11 @@ class Interpreter:
                                                                         i - 3:i + 3] + '...' + '\n' + ' ' * 8 + '^' + '\nSyntaxError: invalid syntax (pos ' + str(
                             i) + ')', file=sys.stderr)
                         sys.exit(1)
-            elif x in list(closablesKeys.keys()) and quotesCheck == -1 or x == '"' and quotesCheck == 1:
+            elif x in list(closablesKeys.keys()) and quotesCheck == -1:
                 closablesKeys[x] += 2 if any(x.endswith(j) for j in '("[') else 1
             elif (temp + x).endswith('?{') and quotesCheck == -1:
                 closablesKeys['{'] += 2
-            elif x in list(closingKeys.keys()) and quotesCheck == -1:
+            elif x in list(closingKeys.keys()) and quotesCheck == 1:
                 closablesKeys[closingKeys[x]] -= 2
             else:
                 pass
@@ -754,7 +760,7 @@ class Interpreter:
         while self.i < len(self.codeString):
             self.x = self.codeString[self.i]
             try:
-                if self.codeString[self.i + 1] in '+-{(=/':
+                if self.codeString[self.i + 1] in '+-{(=/*':
                     self.i += 1
                     self.x = self.codeString[self.i - 1:self.i + 1]
                     if self.x in ['/=', '?{']:
@@ -763,7 +769,7 @@ class Interpreter:
                         if self.x not in ['>/=', '</=', '!/=', ']?{']:
                             self.i -= 1
                             self.x = self.codeString[self.i - 1:self.i + 1]
-                    elif self.x not in ['++', '--', '?{', '~{', '>{', '>=', '<=', '!=', '*=',
+                    elif self.x not in ['++', '--', '//', '**', '?{', '~{', '>{', '>=', '<=', '!=', '*=',
                                         '/=', '!/', '&/', '|/']:
                         self.i -= 1
                         self.x = self.codeString[self.i]
@@ -771,10 +777,10 @@ class Interpreter:
                 pass
             if self.x in self.methods.keys():
                 self.tempvalue = self.memory[self.pointer]
-                self.methods[self.x]()
                 # noinspection PyPep8,PyBroadException
                 try:
-                    pass  # ^ have to go here
+                    print(str(self.methods[self.x]))
+                    self.methods[self.x]()
                 except:
                     etype, value, tb = sys.exc_info()
                     message = ''.join(traceback.format_exception(etype, value, tb))
@@ -792,7 +798,7 @@ if __name__ == '__main__':
     # todo : OOP
     # todo : Import
     # todo : read/write in file
-    codeString = ',>,.<.'
+    codeString = '3**2.'
 
     i = Interpreter()
     i.interpret(codeString)
