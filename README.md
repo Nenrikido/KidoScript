@@ -1,5 +1,10 @@
 # KidoScript
 
+![](https://img.shields.io/github/languages/code-size/Nenrikido/KidoScript.svg)
+![](https://img.shields.io/github/repo-size/Nenrikido/KidoScript.svg)
+![](https://img.shields.io/badge/license-GPL-blue.svg)
+![](https://img.shields.io/github/last-commit/Nenrikido/KidoScript.svg)
+
 A smooth and fast writing language based on BrainFuck (but much simpler dw)
 
 ## Docs :
