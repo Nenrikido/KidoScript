@@ -16,7 +16,7 @@ A smooth and fast writing language based on BrainFuck (but much simpler dw)
 - There's no real booleans, results of comparison are 1 if `True` and 0 if `False`
 - All other characters not in the keys below (basically all characters not enclosed in double quotes) won't be used and will be like commentaries
 
-- KidoScript isn't yet supporting Floating Values, Value Structures, Unicode and Object Oriented Programmation but that's to go (except for Value Structures 'cause it's already using a big one)
+- KidoScript isn't yet supporting Floating Values, Value Structures, Unicode and Object Oriented Programmation but that's to go
 - There's actually 45 key patterns and some more to go
 
 ### Base Keys :
@@ -51,9 +51,9 @@ A smooth and fast writing language based on BrainFuck (but much simpler dw)
 
 - `{ PrintArgumentsPositionInMemory { CodeToExecuteAsFunction }` : 	Stores a function at memory case (memory is now a virtual memory local to the function and argument passed are stored in first cases of this virtual memory)
 
-- `>{ PointerDeplacement }` :										Vector to move value of memory case at pointer position by PointerDeplacement (																			accept only loops and pointer deplacement keys), it can also be used in operations 																		to select another value than the one in the actual memory case. The pointer isn't 																		moving though
+- `>( PointerDeplacement )` :										Vector to move value of memory case at pointer position by PointerDeplacement (																			accept only loops and pointer deplacement keys), it can also be used in operations 																		to select another value than the one in the actual memory case. The pointer isn't 																		moving though
 
-- `~{ PointerDeplacement }` :										Copies value of memory case at pointer position by PointerDeplacement (idem)
+- `~( PointerDeplacement )` :										Copies value of memory case at pointer position by PointerDeplacement (idem)
 - `$` : 															Returns value from function in memory case (need to be launched in another memory 																		case and is exactly like `^` if isn't in function)
 
 - `^` :																Executes code from stored function (or do same as ,)
@@ -61,24 +61,24 @@ A smooth and fast writing language based on BrainFuck (but much simpler dw)
 
 ### Weak comparison (comparing with value processing) : 
 
-- `( LeftMember == RightMember )` : 	Equality comparison
-- `( LeftMember >= RightMember )` : 	Greater Than or Equal comparison
-- `( LeftMember <= RightMember )` : 	Lower Than or Equal comparison
-- `( LeftMember != RightMember )` : 	Non equality comparison
-- `( LeftMember *= RightMember )` :    Sum equality comparison (comparing global added values, `"hello"*="leohl"` => 1)
-- `( LeftMember >*= RightMember )` :    Sum greater than or equal comparison (idem as sum equality but with `>=`)
-- `( LeftMember <*= RightMember )` :    Sum lower than or equal comparison (idem as sum equality but with `<=`)
-- `( LeftMember !*= RightMember )` :    Sum non equality comparison (idem as sum equality but with `!=`)
-- `( LeftMember ! RightMember )` : 	Non gate
-- `( LeftMember & RightMember )` : 	And gate
-- `( LeftMember | RightMember )` : 	Or gate
+- `LeftMember == RightMember` : 	Equality comparison
+- `LeftMember >= RightMember` : 	Greater Than or Equal comparison
+- `LeftMember <= RightMember` : 	Lower Than or Equal comparison
+- `LeftMember != RightMember` : 	Non equality comparison
+- `LeftMember *= RightMember` :    Sum equality comparison (comparing global added values, `"hello"*="leohl"` => 1)
+- `LeftMember >*= RightMember` :    Sum greater than or equal comparison (idem as sum equality but with `>=`)
+- `LeftMember <*= RightMember` :    Sum lower than or equal comparison (idem as sum equality but with `<=`)
+- `LeftMember !*= RightMember` :    Sum non equality comparison (idem as sum equality but with `!=`)
+- `LeftMember ! RightMember` : 	Non gate
+- `LeftMember & RightMember` : 	And gate
+- `LeftMember | RightMember` : 	Or gate
 
 ### Strong comparison (comparing ascii values and types) :
 
-- `( LeftMember =/= RightMember )` :   Equality comparison
-- `( LeftMember >/= RightMember )` :  Greater Than or Equal comparison
-- `( LeftMember </= RightMember )` :  Lesser Than or Equal comparison
-- `( LeftMember !/= RightMember )` :  Non equality comparison
-- `( LeftMember !/ RightMember )` :   Non gate
-- `( LeftMember &/ RightMember )` :   And gate
-- `( LeftMember |/ RightMember )` :   Or gate
+- `LeftMember =/= RightMember` :   Equality comparison
+- `LeftMember >/= RightMember` :  Greater Than or Equal comparison
+- `LeftMember </= RightMember` :  Lesser Than or Equal comparison
+- `LeftMember !/= RightMember` :  Non equality comparison
+- `LeftMember !/ RightMember` :   Non gate
+- `LeftMember &/ RightMember` :   And gate
+- `LeftMember |/ RightMember` :   Or gate
