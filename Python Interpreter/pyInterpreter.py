@@ -70,6 +70,7 @@ class Interpreter:
         returning: bool
 
         def __init__(self, arguments, codeString, interpreter):
+            
             self.arguments = arguments
             self.codeString = codeString
             self.memory = []
@@ -83,6 +84,7 @@ class Interpreter:
                 setattr(self, method.__name__(), method)
 
         def execute(self):
+            
             for i, argument in enumerate(self.arguments):
                 self.memory[i] = argument
             self.interpret(self.codeString)
@@ -109,6 +111,7 @@ class Interpreter:
         codeString: str
 
         def __init__(self, codeString, interpreter):
+            
             self.codeString = codeString
 
             # Simulate inheritance
@@ -121,6 +124,7 @@ class Interpreter:
                     setattr(self, method.__name__(), method)
 
         def getDeplacement(self):
+            
             beginningPointer = self.pointer
             self.interpret(self.codeString)
             return self.pointer - beginningPointer
@@ -131,6 +135,7 @@ class Interpreter:
         return self.Vector(code, self)
 
     def __init__(self):
+        
         self.memory = [0] * 2000
         self.pointer = 0
         self.tempvalue = self.memory[self.pointer]
@@ -162,32 +167,39 @@ class Interpreter:
 
     def scan(self):
         """`,` : Scans from console to memory case at pointer position"""
+        
         self.memory[self.pointer] = input()
 
     def print(self):
         """`.` : Prints what's in memory case at pointer position in console"""
+        
         print(self.memory[self.pointer])
 
     def moveRight(self):
         """`>` : Moves pointer to right"""
+        
         self.pointer = self.pointer + 1 if self.pointer < len(self.memory) - 1 else 0
 
     def moveLeft(self):
         """`<` : Moves pointer to left"""
+        
         self.pointer = self.pointer - 1 if self.pointer > 0 else len(self.memory) - 1
 
     def incrementPointer(self):
         """`+` : Increments memory case at pointer position from 1"""
+        
         n = self.memory[self.pointer]
         self.memory[self.pointer] = n + 1 if type(n) == int else chr(ord(n[-1]) + 1)
 
     def decrementPointer(self):
         """`-` : Decrements memory case at pointer position from 1"""
+        
         n = self.memory[self.pointer]
         self.memory[self.pointer] = n - 1 if type(n) == int else chr(ord(n[-1]) - 1)
 
     def putInt(self):
         """`\d` : (Any integer decimal) : Changes value of memory case at pointer position"""
+        
         intString = ''
         while self.codeString[self.i].isnumeric():
             intString += self.codeString[self.i]
@@ -197,6 +209,7 @@ class Interpreter:
 
     def putString(self):
         """`"Some String"` : Changes value of memory case at pointer position by a string (store in the number of bytes in ASCII) (care to reserved word `func:`)"""
+        
         self.i += 1
         string = ''
         while self.codeString[self.i] != '"':
@@ -206,6 +219,7 @@ class Interpreter:
 
     def add(self):
         """`++` : Addition operator"""
+
         intString = ''
         self.i += 1
         if self.codeString[self.i] != '(':
@@ -219,6 +233,7 @@ class Interpreter:
 
     def negate(self):
         """`--` : Substraction operator"""
+
         intString = ''
         self.i += 1
         if self.codeString[self.i] != '(':
@@ -232,6 +247,7 @@ class Interpreter:
 
     def multiplicate(self):
         """`*` : Multiplication operator"""
+
         intString = ''
         self.i += 1
         if self.codeString[self.i] != '(':
@@ -245,6 +261,7 @@ class Interpreter:
 
     def divide(self):
         """`/` : Division operator"""
+
         intString = ''
         self.i += 1
         if self.codeString[self.i] != '(':
@@ -258,6 +275,7 @@ class Interpreter:
 
     def power(self):
         """`**` : Power operator"""
+
         intString = ''
         self.i += 1
         if self.codeString[self.i] != '(':
@@ -271,6 +289,7 @@ class Interpreter:
 
     def euclidianDivide(self):
         """`//` : Euclidian divisio operator"""
+
         intString = ''
         self.i += 1
         if self.codeString[self.i] != '(':
@@ -284,6 +303,7 @@ class Interpreter:
 
     def modulo(self):
         """`%` : Modulo operator"""
+
         intString = ''
         self.i += 1
         if self.codeString[self.i] != '(':
@@ -313,6 +333,7 @@ class Interpreter:
     @staticmethod
     def expression(rbp=0):
         """Builds the expression with priority"""
+
         # noinspection PyGlobalUndefined
         global token, nextToken
         t = token
@@ -353,6 +374,7 @@ class Interpreter:
 
     def tokenize(self, code):
         """Recursively checks for priority"""
+
         for number, operator in re.findall("\s*(?:(\d+)|(\*\*|.))", code):
             if number:
                 yield self.LiteralToken(number)
@@ -363,6 +385,7 @@ class Interpreter:
 
     def startGroupCode(self):
         """`( CodeToExecuteWithPriorityHandlingOrComparison )` : Group of code with operator and comparison priority (`Comparison` (`and` > `or` > `comparison operators`) > `**` > `//` > `%` > `/` > `*` > `-` > `+`)"""
+        
         global token, nextToken
 
         # Get code to execute in group
@@ -502,7 +525,7 @@ class Interpreter:
         self.arguments = []
 
     def startVectorCode(self, isSelectionning=False):
-        """`( PointerDeplacement )` : Vector to move value of memory case at pointer position by PointerDeplacement (accept only loops and pointer deplacement keys), it can also be used in operations to select another value than the one in the actual memory case. The pointer isn't"""
+        """`>( PointerDeplacement )` : Vector to move value of memory case at pointer position by PointerDeplacement (accept only loops and pointer deplacement keys), it can also be used in operations to select another value than the one in the actual memory case. The pointer isn't"""
 
         # Get Vector Deplacement (and errors with it)
         self.i += 1
@@ -521,7 +544,7 @@ class Interpreter:
             self.memory[self.pointer] = 0
 
     def startCopyVectorCode(self):
-        """`~{ PointerDeplacement }` :	Copies value of memory case at pointer position by PointerDeplacement (idem)"""
+        """`~( PointerDeplacement )` :	Copies value of memory case at pointer position by PointerDeplacement (idem)"""
 
         # Get Vector Deplacement (and errors with it)
         self.i += 1
@@ -568,6 +591,8 @@ class Interpreter:
 
     @staticmethod
     def isWeaklyEq(leftMember, rightMember):
+        """`LeftMember == RightMember` : Weak equality comparison"""
+
         return leftMember == rightMember if type(leftMember) == type(rightMember) \
             else ord(leftMember) == rightMember if type(leftMember) == str and len(leftMember) == 1 and type(
             rightMember) == int \
@@ -578,6 +603,8 @@ class Interpreter:
 
     @staticmethod
     def isWeaklyGe(leftMember, rightMember):
+        """`LeftMember >= RightMember` : Weak greater Than or Equal comparison"""
+
         return leftMember >= rightMember if type(leftMember) == type(rightMember) \
             else ord(leftMember) >= rightMember if type(leftMember) == str and len(leftMember) == 1 and type(
             rightMember) == int \
@@ -588,6 +615,8 @@ class Interpreter:
 
     @staticmethod
     def isWeaklyLe(leftMember, rightMember):
+        """`LeftMember <= RightMember` : Weak lower Than or Equal comparison"""
+
         return leftMember <= rightMember if type(leftMember) == type(rightMember) \
             else ord(leftMember) <= rightMember if type(leftMember) == str and len(leftMember) == 1 and type(
             rightMember) == int \
@@ -598,6 +627,8 @@ class Interpreter:
 
     @staticmethod
     def isWeaklyNe(leftMember, rightMember):
+        """`LeftMember != RightMember` : Weak non equality comparison"""
+
         return leftMember != rightMember if type(leftMember) == type(rightMember) \
             else ord(leftMember) != rightMember if type(leftMember) == str and len(leftMember) == 1 and type(
             rightMember) == int \
@@ -607,6 +638,8 @@ class Interpreter:
             else leftMember != len(rightMember)
 
     def isSumEq(self, leftMember, rightMember):
+        """`LeftMember *= RightMember` : Weak sum equality comparison (comparing global added values, `"hello"*="leohl"` => 1)"""
+
         return sum([ord(i) for i in leftMember]) == rightMember if type(leftMember) == str and type(rightMember) == int \
             else leftMember == sum([ord(i) for i in rightMember]) if type(rightMember) == str and type(
             leftMember) == int \
@@ -615,6 +648,8 @@ class Interpreter:
             else self.isWeaklyEq(leftMember, rightMember)
 
     def isSumGe(self, leftMember, rightMember):
+        """`LeftMember >*= RightMember` : Weak sum greater than or equal comparison (idem as sum equality but with `>=`)"""
+        
         return sum([ord(i) for i in leftMember]) >= rightMember if type(leftMember) == str and type(rightMember) == int \
             else leftMember >= sum([ord(i) for i in rightMember]) if type(rightMember) == str and type(
             leftMember) == int \
@@ -623,6 +658,8 @@ class Interpreter:
             else self.isWeaklyEq(leftMember, rightMember)
 
     def isSumLe(self, leftMember, rightMember):
+        """`LeftMember <*= RightMember` : Weak sum lower than or equal comparison (idem as sum equality but with `<=`)"""
+
         return sum([ord(i) for i in leftMember]) <= rightMember if type(leftMember) == str and type(rightMember) == int \
             else leftMember <= sum([ord(i) for i in rightMember]) if type(rightMember) == str and type(
             leftMember) == int \
@@ -631,6 +668,8 @@ class Interpreter:
             else self.isWeaklyEq(leftMember, rightMember)
 
     def isSumNe(self, leftMember, rightMember):
+        """`LeftMember !*= RightMember` : Weak sum non equality comparison (idem as sum equality but with `!=`)"""
+
         return sum([ord(i) for i in leftMember]) != rightMember if type(leftMember) == str and type(rightMember) == int \
             else leftMember != sum([ord(i) for i in rightMember]) if type(rightMember) == str and type(
             leftMember) == int \
@@ -640,46 +679,68 @@ class Interpreter:
 
     @staticmethod
     def weakNon(thing):
+        """`LeftMember ! RightMember` : Weak non gate"""
+
         return not bool(thing)
 
     @staticmethod
     def weakAnd(leftMember, rightMember):
+        """`LeftMember & RightMember` : Weak and gate"""
+
         return bool(leftMember) and bool(rightMember)
 
     @staticmethod
     def weakOr(leftMember, rightMember):
+        """`LeftMember | RightMember` : Weak Or gate"""
+
         return bool(leftMember) or bool(rightMember)
 
     @staticmethod
     def isStronglyEq(leftMember, rightMember):
+        """`LeftMember =/= RightMember` : Strong equality comparison"""
+
         return leftMember == rightMember and type(leftMember) == type(rightMember)
 
     @staticmethod
     def isStronglyGe(leftMember, rightMember):
+        """`LeftMember >/= RightMember` : Strong greater Than or Equal comparison"""
+
         return leftMember >= rightMember and type(leftMember) == type(rightMember)
 
     @staticmethod
     def isStronglyLe(leftMember, rightMember):
+        """`LeftMember </= RightMember` : Strong lesser Than or Equal comparison"""
+
         return leftMember <= rightMember and type(leftMember) == type(rightMember)
 
     @staticmethod
     def isStronglyNe(leftMember, rightMember):
+        """`LeftMember !/= RightMember` : Strong non equality comparison"""
+
         return leftMember != rightMember and type(leftMember) == type(rightMember)
 
     @staticmethod
     def strongNon(thing):
+        """`LeftMember !/ RightMember` : Strong non gate"""
+
         return not thing
 
     @staticmethod
     def strongAnd(leftMember, rightMember):
+        """`LeftMember &/ RightMember` : Strong and gate"""
+
         return leftMember and rightMember and type(leftMember) == type(rightMember)
 
     @staticmethod
     def strongOr(leftMember, rightMember):
+        """`LeftMember |/ RightMember` : Strong or gate"""
+
         return leftMember or rightMember and type(leftMember) == type(rightMember)
 
     @staticmethod
     def verify(codeString):
+        """Verifies the syntax of the KidoScript code"""
+
         quotesCheck = -1
         closablesKeys = {'[': 0, '(': 0, '{': 0, '"': 0}
         closingKeys = {']': '[', ')': '(', '}': '{', '"': '"'}
@@ -750,7 +811,58 @@ class Interpreter:
                           file=sys.stderr)
                     sys.exit(1)
 
+    def lex(self, code):
+        """Transforms the KidoScript code into a list of tokens"""
+
+        methodChars = [list(filter(lambda x: len(x) == i, self.methods)) for i in range(4)]
+        temp = ""
+        tokenList = {}
+        position = 0
+        quoteStatus = False
+        lookup = False
+        for pos,i in enumerate(code):
+            char = i
+            if i.isnumeric() and len(temp) == 0 or i.isnumeric() and len(temp) > 0 and not temp[-1].isnumeric():
+                lookup = False
+                position += 1
+            elif i.isnumeric():
+                pass
+            elif i == '"':
+                lookup = False
+                if not quoteStatus and position > 0 or quoteStatus and len(temp) > 0 and temp[-1] != '"':
+                    position += 1
+                char = ""
+                quoteStatus = not quoteStatus
+            elif any(n.startswith(i) for n in methodChars[2]) and not lookup or any(n.startswith(i) for n in methodChars[3]) and not lookup:
+                lookup = True
+                position += 1
+            elif len(temp) > 0 and any(n.startswith(temp[-1] + i) for n in methodChars[3]) and lookup or quoteStatus:
+                lookup = True
+            elif len(temp) > 0 and (temp[-1] + i) in methodChars[2]:
+                lookup = False
+                tokenList[position] = ""
+                char = temp[-1] + i
+            elif temp + i in methodChars[3]:
+                lookup = False
+                tokenList[position] = ""
+                char = temp + i
+            elif i in methodChars[1]:
+                lookup = False
+                position += 1
+            else:
+                char = ""
+            if position not in tokenList:
+                tokenList[position] = ''
+            tokenList[position] += char
+            if not (len(temp) > 0 and temp[-1] == '"') and tokenList[position] == '':
+                del tokenList[position]
+            if len(temp) == 2:
+                temp = temp[1]
+            temp += i
+        return list(tokenList.values())
+
     def interpret(self, codeString):
+        """Interprets the KidoScript code"""
 
         # Verifies if good syntax
         self.codeString = codeString + ' '

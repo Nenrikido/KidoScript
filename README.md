@@ -61,24 +61,24 @@ A smooth and fast writing language based on BrainFuck (but much simpler dw)
 
 ### Weak comparison (comparing with value processing) : 
 
-- `LeftMember == RightMember` : 	Equality comparison
-- `LeftMember >= RightMember` : 	Greater Than or Equal comparison
-- `LeftMember <= RightMember` : 	Lower Than or Equal comparison
-- `LeftMember != RightMember` : 	Non equality comparison
-- `LeftMember *= RightMember` :    Sum equality comparison (comparing global added values, `"hello"*="leohl"` => 1)
-- `LeftMember >*= RightMember` :    Sum greater than or equal comparison (idem as sum equality but with `>=`)
-- `LeftMember <*= RightMember` :    Sum lower than or equal comparison (idem as sum equality but with `<=`)
-- `LeftMember !*= RightMember` :    Sum non equality comparison (idem as sum equality but with `!=`)
-- `LeftMember ! RightMember` : 	Non gate
-- `LeftMember & RightMember` : 	And gate
-- `LeftMember | RightMember` : 	Or gate
+- `LeftMember == RightMember` : 	Weak equality comparison
+- `LeftMember >= RightMember` : 	Weak greater Than or Equal comparison
+- `LeftMember <= RightMember` : 	Weak lower Than or Equal comparison
+- `LeftMember != RightMember` : 	Weak non equality comparison
+- `LeftMember *= RightMember` :    Weak sum equality comparison (comparing global added values, `"hello"*="leohl"` => 1)
+- `LeftMember >*= RightMember` :    Weak sum greater than or equal comparison (idem as sum equality but with `>=`)
+- `LeftMember <*= RightMember` :    Weak sum lower than or equal comparison (idem as sum equality but with `<=`)
+- `LeftMember !*= RightMember` :    Weak sum non equality comparison (idem as sum equality but with `!=`)
+- `LeftMember ! RightMember` : 	Weak non gate
+- `LeftMember & RightMember` : 	Weak and gate
+- `LeftMember | RightMember` : 	Weak Or gate
 
 ### Strong comparison (comparing ascii values and types) :
 
-- `LeftMember =/= RightMember` :   Equality comparison
-- `LeftMember >/= RightMember` :  Greater Than or Equal comparison
-- `LeftMember </= RightMember` :  Lesser Than or Equal comparison
-- `LeftMember !/= RightMember` :  Non equality comparison
-- `LeftMember !/ RightMember` :   Non gate
-- `LeftMember &/ RightMember` :   And gate
-- `LeftMember |/ RightMember` :   Or gate
+- `LeftMember =/= RightMember` :   Strong equality comparison
+- `LeftMember >/= RightMember` :  Strong greater Than or Equal comparison
+- `LeftMember </= RightMember` :  Strong lesser Than or Equal comparison
+- `LeftMember !/= RightMember` :  Strong non equality comparison
+- `LeftMember !/ RightMember` :   Strong non gate
+- `LeftMember &/ RightMember` :   Strong and gate
+- `LeftMember |/ RightMember` :   Strong or gate
