@@ -27,15 +27,16 @@ import _io
 class Interpreter:
     """Python Interpreter for KidoScript, developped by Nenrikido"""
 
-    memory: list
-    pointer: int
-    tempvalue: object
-    methods: dict
+    memory:     list
+    pointer:    int
+    tempvalue:  object
+    methods:    dict
     priorities: list
-    arguments: list
-    i: int
-    x: str
+    arguments:  list
+    i:          int
+    x:          str
     codeString: str
+    tokens:     list
 
     # noinspection PyCompatibility
     class Capturing(list):
@@ -157,8 +158,6 @@ class Interpreter:
                         '/=': self.isStronglyEq, '>/=': self.isStronglyGe, '</=': self.isStronglyLe,
                         '!/=': self.isStronglyNe,
                         '!/': self.strongNon, '&/': self.strongAnd, '|/': self.strongOr}
-        self.priorities = ['.\*\*|\/\/', '..%', '..\*|..\/', '..-|..+', '.&\/|..&', '..\|\/|.\|',
-                           '.==|.!=|.>=|.<=|.\*=|>\*=|<\*=|!\*=|=\/=|!\/=|>\/=|<\/=']
         self.arguments = []
         self.i = 0
         self.x = ''
@@ -737,6 +736,7 @@ class Interpreter:
 
         return leftMember or rightMember and type(leftMember) == type(rightMember)
 
+    #TODO : verify tokens instead of characters
     @staticmethod
     def verify(codeString):
         """Verifies the syntax of the KidoScript code"""
@@ -811,17 +811,20 @@ class Interpreter:
                           file=sys.stderr)
                     sys.exit(1)
 
-    def lex(self, code):
+    def lex(self):
         """Transforms the KidoScript code into a list of tokens"""
 
         methodChars = [list(filter(lambda x: len(x) == i, self.methods)) for i in range(4)]
+        methodChars[1] += ['}', ')']
         temp = ""
         tokenList = {}
         position = 0
         quoteStatus = False
         lookup = False
-        for pos,i in enumerate(code):
+        for pos,i in enumerate(self.codeString):
             char = i
+            if char not in '0123456789,.><+-"*/%#;()[]{}?~$^|&':
+                continue
             if i.isnumeric() and len(temp) == 0 or i.isnumeric() and len(temp) > 0 and not temp[-1].isnumeric():
                 lookup = False
                 position += 1
@@ -859,32 +862,51 @@ class Interpreter:
             if len(temp) == 2:
                 temp = temp[1]
             temp += i
-        return list(tokenList.values())
+        self.tokens = list(tokenList.values())
+
+    def parse(self):
+        inGroup = False
+        self.priorities = ['**', '%', '*//', '..-|..+', '.&\/|..&', '..\|\/|.\|',
+                           '.==|.!=|.>=|.<=|.\*=|>\*=|<\*=|!\*=|=\/=|!\/=|>\/=|<\/=']
+        for token in self.tokens:
+            if token in "01234566789+-**//%":
+                inGroup = True
+            if inGroup:
+                pass
+
 
     def interpret(self, codeString):
         """Interprets the KidoScript code"""
 
         # Verifies if good syntax
         self.codeString = codeString + ' '
-        self.verify(self.codeString)
 
+        self.lex()
+        self.parse()
+        print(self.tokens)
+        # TODO : delete
+        return
+
+        self.verify(self.tokens)
+
+        # TODO : check & interprets tokens instead of chars
         # Interprets
-        while self.i < len(self.codeString):
-            self.x = self.codeString[self.i]
+        while self.i < len(self.tokens):
+            self.x = self.tokens[self.i]
             try:
-                if self.codeString[self.i + 1] in '+-{(=/*':
+                if self.tokens[self.i + 1] in '+-{(=/*':
                     self.i += 1
-                    self.x = self.codeString[self.i - 1:self.i + 1]
+                    self.x = self.tokens[self.i - 1:self.i + 1]
                     if self.x in ['/=', '?{']:
                         self.i += 1
-                        self.x = self.codeString[self.i - 2:self.i + 1]
+                        self.x = self.tokens[self.i - 2:self.i + 1]
                         if self.x not in ['>/=', '</=', '!/=', ']?{']:
                             self.i -= 1
-                            self.x = self.codeString[self.i - 1:self.i + 1]
+                            self.x = self.tokens[self.i - 1:self.i + 1]
                     elif self.x not in ['++', '--', '//', '**', '?{', '~{', '>{', '>=', '<=', '!=', '*=',
                                         '/=', '!/', '&/', '|/']:
                         self.i -= 1
-                        self.x = self.codeString[self.i]
+                        self.x = self.tokens[self.i]
             except IndexError:
                 pass
             if self.x in self.methods.keys():
@@ -907,10 +929,8 @@ class Interpreter:
 if __name__ == '__main__':
     # todo : GUI (or maybe IDE)
     # todo : Multiprocessing
-    # todo : OOP
-    # todo : Import
-    # todo : read/write in file
-    codeString = '3**2.'
+    # todo : Add shell calls
+    codeString = '3/JEAZJ{2}.'
 
     i = Interpreter()
     i.interpret(codeString)
